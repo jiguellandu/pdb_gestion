@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block titre %}Predications{% endblock %}
+{% block titre_page %}Predications{% endblock %}
+{% block contenu %}
+{% if user.role == "administrateur" %}
+<p><a href="{% url 'operations:creer_predication' %}"><button type="button">+ Nouvelle predication</button></a></p>
+{% endif %}
+<div class="table-responsive">
+<table>
+    <tr><th>Date</th><th>Predicateur</th><th>Theme</th><th>Texte biblique</th><th>Type</th></tr>
+    {% for p in predications %}
+    <tr>
+        <td>{{ p.date_predication }}</td>
+        <td>{{ p.predicateur }}</td>
+        <td>{{ p.theme }}</td>
+        <td>{{ p.texte_biblique|default:"—" }}</td>
+        <td>{{ p.get_type_culte_display }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">Aucune predication enregistree</td></tr>
+    {% endfor %}
+</table>
+</div>
+{% endblock %}

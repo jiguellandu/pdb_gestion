@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titre %}Rendez-vous pasteurs{% endblock %}
+{% block titre_page %}Rendez-vous pasteurs{% endblock %}
+{% block contenu %}
+{% if user.role == "administrateur" or user.role == "pasteur" %}
+<p><a href="{% url 'agenda:creer_rendez_vous' %}"><button type="button">+ Nouveau rendez-vous</button></a></p>
+{% endif %}
+<table>
+    <tr><th>Date</th><th>Heure</th><th>Pasteur</th><th>Motif</th><th>Statut</th></tr>
+    {% for rdv in rendez_vous %}
+    <tr>
+        <td>{{ rdv.date }}</td>
+        <td>{{ rdv.heure_debut }}</td>
+        <td>{{ rdv.pasteur.username }}</td>
+        <td>{{ rdv.motif }}</td>
+        <td>{{ rdv.get_statut_display }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">Aucun rendez-vous enregistre</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

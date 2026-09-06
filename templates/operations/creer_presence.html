@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titre %}Nouvelle presence{% endblock %}
+{% block titre_page %}Nouvelle presence{% endblock %}
+{% block contenu %}
+<form method="post" class="formulaire-connexion" style="max-width:500px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enregistrer</button>
+</form>
+{% endblock %}

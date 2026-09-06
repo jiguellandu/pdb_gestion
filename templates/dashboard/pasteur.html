@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titre %}Tableau de bord — Pasteur{% endblock %}
+{% block titre_page %}Tableau de bord pasteur{% endblock %}
+{% block contenu %}
+<section class="cartes">
+    <div class="carte">
+        <p class="carte-label">Membres</p>
+        <p class="carte-valeur">{{ nb_membres }}</p>
+    </div>
+    <div class="carte">
+        <p class="carte-label">Departements actifs</p>
+        <p class="carte-valeur">{{ nb_departements_actifs }}</p>
+    </div>
+</section>
+<h2>Depenses par departement</h2>
+<table>
+    <tr><th>Departement</th><th>Total</th><th>Nombre</th></tr>
+    {% for ligne in depenses_par_departement %}
+    <tr>
+        <td>{{ ligne.departement__nom }}</td>
+        <td>{{ ligne.total }}</td>
+        <td>{{ ligne.nb }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

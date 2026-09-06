@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block titre %}Membres{% endblock %}
+{% block titre_page %}Membres{% endblock %}
+{% block contenu %}
+<table>
+    <tr><th>Nom</th><th>Sexe</th><th>Statut matrimonial</th><th>Departement</th><th>Baptise</th></tr>
+    {% for m in membres %}
+    <tr>
+        <td>{{ m.nom|default:"—" }}</td>
+        <td>{{ m.sexe }}</td>
+        <td>{{ m.statut_matrimonial }}</td>
+        <td>{{ m.departement.nom|default:"—" }}</td>
+        <td>{% if m.baptise %}Oui{% else %}Non{% endif %}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">Aucun membre enregistre</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

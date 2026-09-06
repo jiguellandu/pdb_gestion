@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titre %}Departements{% endblock %}
+{% block titre_page %}Departements{% endblock %}
+{% block contenu %}
+<div class="cartes">
+    {% for d in departements %}
+    <a href="{% url 'core:detail_departement' d.id %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-building"></i></div>
+        <div>
+            <p class="carte-label">{{ d.responsable|default:"Pas de responsable" }}</p>
+            <p class="carte-valeur" style="font-size:1.15rem;">{{ d.nom|capfirst }}</p>
+        </div>
+    </div>
+    </a>
+    {% empty %}
+    <p>Aucun departement enregistre</p>
+    {% endfor %}
+</div>
+{% endblock %}

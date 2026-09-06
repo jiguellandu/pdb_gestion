@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titre %}Tableau de bord — Chef de departement{% endblock %}
+{% block titre_page %}{{ departement.nom|default:"Aucun departement assigne" }}{% endblock %}
+{% block contenu %}
+<h2>Activites recentes</h2>
+<ul>
+    {% for activite in activites %}
+    <li>{{ activite.date_activite }} — {{ activite.statut.nom }} — {{ activite.description }}</li>
+    {% empty %}
+    <li>Aucune activite enregistree</li>
+    {% endfor %}
+</ul>
+<h2>Achats en cours</h2>
+<ul>
+    {% for achat in achats %}
+    <li>{{ achat.description }} — {{ achat.statut.nom }} ({{ achat.urgence }})</li>
+    {% empty %}
+    <li>Aucun achat en cours</li>
+    {% endfor %}
+</ul>
+{% endblock %}

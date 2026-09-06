@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block titre %}Presences{% endblock %}
+{% block titre_page %}Presences{% endblock %}
+{% block contenu %}
+<div class="cartes" style="margin-bottom:1.5rem;">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-chart-line"></i></div>
+        <div><p class="carte-label">Moyenne de frequentation</p><p class="carte-valeur">{{ moyenne }}</p></div>
+    </div>
+</div>
+{% if user.role == "administrateur" or user.role == "secretaire" %}
+<p><a href="{% url 'operations:creer_presence' %}"><button type="button">+ Nouvelle presence</button></a></p>
+{% endif %}
+<div class="table-responsive">
+<table>
+    <tr><th>Date</th><th>Type</th><th>Hommes</th><th>Femmes</th><th>Enfants</th><th>Total</th></tr>
+    {% for p in presences %}
+    <tr>
+        <td>{{ p.date_culte }}</td>
+        <td>{{ p.get_type_culte_display }}{% if p.nom_activite %} — {{ p.nom_activite }}{% endif %}</td>
+        <td>{{ p.hommes }}</td>
+        <td>{{ p.femmes }}</td>
+        <td>{{ p.enfants }}</td>
+        <td><strong>{{ p.total }}</strong></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">Aucune presence enregistree</td></tr>
+    {% endfor %}
+</table>
+</div>
+{% endblock %}

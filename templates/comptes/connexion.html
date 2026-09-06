@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titre %}Connexion — PDB Gestion{% endblock %}
+{% block contenu&_visiteur %}
+<div class="formulaire-connexion">
+    <h1>PDB Gestion</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% if erreur %}<p class="erreur">{{ erreur }}</p>{% endif %}
+        <label>Nom d'utilisateur <input type="text" name="username" required></label>
+        <label>Mot de passe <input type="password" name="password" required></label>
+        <button type="submit">Se connecter</button>
+    </form>
+</div>
+{% endblock %}

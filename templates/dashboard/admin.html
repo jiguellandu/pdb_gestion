@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block titre %}Tableau de bord — Administrateur{% endblock %}
+{% block titre_page %}Tableau de bord administrateur{% endblock %}
+{% block contenu %}
+<form method="post" action="{% url 'dashboard:synchroniser' %}" class="bouton-sync">
+    {% csrf_token %}
+    <button type="submit"><i class="fa-solid fa-rotate"></i> Synchroniser Kobo maintenant</button>
+</form>
+
+<section class="cartes">
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1rem; margin-bottom:2rem;">
+    <div class="table-responsive" style="padding:1.2rem;">
+        <h2 style="margin-top:0;">Repartition des membres</h2>
+        <canvas id="graphiqueSexe" height="200"></canvas>
+    </div>
+    <div class="table-responsive" style="padding:1.2rem;">
+        <h2 style="margin-top:0;">Depenses par departement</h2>
+        <canvas id="graphiqueDepartement" height="200"></canvas>
+    </div>
+</div>
+
+<div class="table-responsive" style="padding:1.2rem; margin-bottom:2rem;">
+    <h2 style="margin-top:0;">Evolution finances (6 derniers mois)</h2>
+    <canvas id="graphiqueEvolution" height="90"></canvas>
+</div>
+    <a href="{% url 'membres:liste_membres' %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-users"></i></div>
+        <div><p class="carte-label">Membres actifs</p><p class="carte-valeur">{{ nb_membres }}</p></div>
+    </div>
+    </a>
+    <a href="{% url 'membres:liste_nouveaux_membres' %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-user-plus"></i></div>
+        <div><p class="carte-label">Nouveaux membres</p><p class="carte-valeur">{{ nb_nouveaux_membres }}</p></div>
+    </div>
+    </a>
+    <a href="{% url 'finance:liste_finances' %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div>
+            <p class="carte-label">Offrandes cumulees</p>
+            {% for o in offrandes_par_devise %}
+            <p class="carte-valeur" style="font-size:1.1rem;">{{ o.total }} {{ o.devise__code|upper }}</p>
+            {% empty %}
+            <p class="carte-valeur">0</p>
+            {% endfor %}
+        </div>
+    </div>
+    </a>
+    <a href="{% url 'finance:liste_achats' %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-cart-shopping"></i></div>
+        <div><p class="carte-label">Achats en attente</p><p class="carte-valeur">{{ achats_en_attente }}</p></div>
+    </div>
+    </a>
+    <a href="{% url 'operations:liste_inventaire' %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <div><p class="carte-label">Articles en inventaire</p><p class="carte-valeur">{{ nb_inventaire }}</p></div>
+    </div>
+    </a>
+    <a href="{% url 'operations:liste_suivi_activites' %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-list-check"></i></div>
+        <div><p class="carte-label">Activites suivies</p><p class="carte-valeur">{{ nb_suivi_activites }}</p></div>
+    </div>
+    </a>
+    <a href="{% url 'operations:liste_evaluations' %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-star-half-stroke"></i></div>
+        <div><p class="carte-label">Evaluations</p><p class="carte-valeur">{{ nb_evaluations }}</p></div>
+    </div>
+    </a>
+    <a href="{% url 'operations:liste_renseignements_culte' %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-microphone"></i></div>
+        <div><p class="carte-label">Renseignements culte</p><p class="carte-valeur">{{ nb_renseignements_culte }}</p></div>
+    </div>
+    </a>
+    <a href="{% url 'finance:liste_preuves_paiement' %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-receipt"></i></div>
+        <div><p class="carte-label">Preuves de paiement</p><p class="carte-valeur">{{ nb_preuves_paiement }}</p></div>
+    </div>
+    </a>
+    <a href="{% url 'agenda:evenements' %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-calendar-days"></i></div>
+        <div><p class="carte-label">Evenements calendrier</p><p class="carte-valeur">{{ nb_evenements }}</p></div>
+    </div>
+    </a>
+    <a href="{% url 'agenda:rendez_vous' %}" class="carte-lien">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-handshake"></i></div>
+        <div><p class="carte-label">Rendez-vous pasteurs</p><p class="carte-valeur">{{ nb_rendez_vous }}</p></div>
+    </div>
+    </a>
+</section>
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1rem; margin-bottom:2rem;">
+
+    <div class="table-responsive" style="padding:1.2rem;">
+        <h2 style="margin-top:0;">Rendez-vous d'aujourd'hui</h2>
+        <ul class="liste-simple">
+            {% for rdv in rendez_vous_aujourdhui %}
+            <li>
+                <strong>{{ rdv.heure_debut|time:"H:i" }}</strong> — {{ rdv.motif|default:"Rendez-vous" }}
+                <br><span style="color:var(--slate); font-size:0.82rem;">{{ rdv.pasteur.username }} — {{ rdv.get_statut_display }}</span>
+            </li>
+            {% empty %}
+            <li>Aucun rendez-vous aujourd'hui</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="table-responsive" style="padding:1.2rem;">
+        <h2 style="margin-top:0;">Evenements a venir</h2>
+        <ul class="liste-simple">
+            {% for e in evenements_a_venir %}
+            <li>
+                <strong>{{ e.date_debut|date:"d/m" }}</strong> — {{ e.titre }}
+                <br><span style="color:var(--slate); font-size:0.82rem;">{{ e.get_type_display }} — {{ e.lieu|default:"—" }}</span>
+            </li>
+            {% empty %}
+            <li>Aucun evenement a venir</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="table-responsive" style="padding:1.2rem;">
+        <h2 style="margin-top:0;">Activites recentes</h2>
+        <ul class="liste-simple">
+            {% for a in activites_recentes %}
+            <li>
+                {{ a.utilisateur|default:"Systeme (Kobo)" }} a {{ a.get_action_display|lower }} — {{ a.modele }}
+                <br><span style="color:var(--slate); font-size:0.82rem;">{{ a.date_action|date:"d/m/Y H:i" }}</span>
+            </li>
+            {% empty %}
+            <li>Aucune activite enregistree</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</div>
+
+<h2>Dernieres depenses</h2>
+<div class="table-responsive">
+<table>
+    <tr><th>Type</th><th>Departement</th><th>Statut</th><th>Montant</th></tr>
+    {% for depense in dernieres_depenses %}
+    <tr>
+        <td>{{ depense.type_depense }}</td>
+        <td>{{ depense.departement.nom }}</td>
+        <td>{{ depense.statut.nom }}</td>
+        <td>{{ depense.montant }} {{ depense.devise.code }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">Aucune depense enregistree</td></tr>
+    {% endfor %}
+</table>
+</div>
+{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+const donneesSexe = {{ donnees_sexe_json|safe }};
+new Chart(document.getElementById('graphiqueSexe'), {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(donneesSexe),
+        datasets: [{ data: Object.values(donneesSexe), backgroundColor: ['#1B2340', '#B8873D'] }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+});
+
+const depensesDept = {{ depenses_departement_json|safe }};
+new Chart(document.getElementById('graphiqueDepartement'), {
+    type: 'doughnut',
+    data: {
+        labels: depensesDept.labels,
+        datasets: [{
+            data: depensesDept.valeurs,
+            backgroundColor: ['#1B2340','#B8873D','#4A7856','#C77B3D','#5B6478','#8B6F47','#3E5C76','#A85751']
+        }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+});
+
+const evolution = {{ evolution_json|safe }};
+new Chart(document.getElementById('graphiqueEvolution'), {
+    type: 'line',
+    data: {
+        labels: evolution.labels,
+        datasets: [
+            { label: 'Recettes', data: evolution.recettes, borderColor: '#4A7856', backgroundColor: 'rgba(74,120,86,0.1)', fill: true, tension: 0.3 },
+            { label: 'Depenses', data: evolution.depenses, borderColor: '#C77B3D', backgroundColor: 'rgba(199,123,61,0.1)', fill: true, tension: 0.3 }
+        ]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+});
+</script>

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block titre %}Preuves de paiement{% endblock %}
+{% block contenu %}
+<h1>Preuves de paiement</h1>
+<table>
+    <tr><th>Date</th><th>Departement</th><th>Montant</th><th>Mode de paiement</th></tr>
+    {% for p in preuves %}
+    <tr>
+        <td>{{ p.date_creation|date:"d/m/Y" }}</td>
+        <td>{{ p.departement.nom }}</td>
+        <td>{{ p.montant|default:"—" }} {{ p.devise.code|upper }}</td>
+        <td>{{ p.get_mode_paiement_display }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">Aucune preuve enregistree</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titre %}Calendrier de l'eglise{% endblock %}
+{% block titre_page %}Calendrier de l'eglise{% endblock %}
+{% block contenu %}
+{% if user.role == "administrateur" %}
+<p><a href="{% url 'agenda:creer_evenement' %}"><button type="button">+ Nouvel evenement</button></a></p>
+{% endif %}
+<table>
+    <tr><th>Date</th><th>Titre</th><th>Type</th><th>Lieu</th><th>Departement</th></tr>
+    {% for e in evenements %}
+    <tr>
+        <td>{{ e.date_debut }}</td>
+        <td>{{ e.titre }}</td>
+        <td>{{ e.get_type_display }}</td>
+        <td>{{ e.lieu }}</td>
+        <td>{{ e.departement.nom|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">Aucun evenement enregistre</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

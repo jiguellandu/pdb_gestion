@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titre %}PDB Gestion{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+{% if user.is_authenticated %}
+<div class="mise-en-page">
+    <aside class="sidebar">
+        <div class="logo"><i class="fa-solid fa-church"></i> PDB Gestion</div>
+        <nav>
+            <a href="{% url 'dashboard:accueil' %}"><i class="fa-solid fa-gauge"></i> Tableau de bord</a>
+	   <a href="{% url 'core:liste_departements' %}"><i class="fa-solid fa-building"></i> Departements</a>
+	   {% if user.role == "administrateur" %}
+	   <div class="groupe-titre">Rapports</div>
+	   <a href="{% url 'dashboard:rapports' %}"><i class="fa-solid fa-chart-column"></i> Statistiques</a>
+	   {% endif %}
+
+           {% if user.role == "administrateur" or user.role == "secretaire" %}
+	   <div class="groupe-titre">Membres</div>
+	   <a href="{% url 'membres:liste_membres' %}"><i class="fa-solid fa-users"></i> Membres</a>
+	   <a href="{% url 'membres:liste_nouveaux_membres' %}"><i class="fa-solid fa-user-plus"></i> Nouveaux membres</a>
+	   <a href="{% url 'operations:liste_presences' %}"><i class="fa-solid fa-clipboard-check"></i> Presences</a>
+	   {% endif %}
+
+           {% if user.role == "administrateur" %}
+	   <div class="groupe-titre">Operations</div>
+	   <a href="{% url 'operations:liste_inventaire' %}"><i class="fa-solid fa-boxes-stacked"></i> Inventaire</a>
+	   <a href="{% url 'operations:liste_suivi_activites' %}"><i class="fa-solid fa-list-check"></i> Suivi activites</a>
+	   <a href="{% url 'operations:liste_evaluations' %}"><i class="fa-solid fa-star-half-stroke"></i> Evaluations</a>
+ 	   <a href="{% url 'operations:liste_renseignements_culte' %}"><i class="fa-solid fa-microphone"></i> Renseignements culte</a>
+	   <a href="{% url 'operations:liste_predications' %}"><i class="fa-solid fa-book-bible"></i> Predications</a>
+	   {% endif %}
+
+            <div class="groupe-titre">Agenda</div>
+            <a href="{% url 'agenda:evenements' %}"><i class="fa-solid fa-calendar-days"></i> Calendrier de l'eglise</a>
+            {% if user.role == "administrateur" or user.role == "pasteur" %}
+            <a href="{% url 'agenda:rendez_vous' %}"><i class="fa-solid fa-handshake"></i> Rendez-vous</a>
+            {% endif %}
+
+             {% if user.role == "administrateur" or user.role == "tresorier" %}
+            <div class="groupe-titre">Finances</div>
+	    <a href="{% url 'finance:liste_finances' %}"><i class="fa-solid fa-hand-holding-dollar"></i> Recettes</a>
+	    <a href="{% url 'finance:liste_depenses' %}"><i class="fa-solid fa-money-bill-wave"></i> Depenses</a>
+	    <a href="{% url 'finance:liste_achats' %}"><i class="fa-solid fa-cart-shopping"></i> Achats</a>
+	    <a href="{% url 'finance:liste_preuves_paiement' %}"><i class="fa-solid fa-receipt"></i> Preuves de paiement</a>
+	    <a href="{% url 'finance:liste_budgets' %}"><i class="fa-solid fa-chart-pie"></i> Budget</a>
+	    {% endif %}
+
+            {% if user.role == "administrateur" %}
+            <div class="groupe-titre">Administration</div>
+            <a href="/admin/"><i class="fa-solid fa-user-gear"></i> Utilisateurs</a>
+            {% endif %}
+        </nav>
+    </aside>
+
+    <div class="contenu-principal">
+        <div class="entete-page">
+            <h1>{% block titre_page %}{% endblock %}</h1>
+            <span class="utilisateur">
+                <span class="avatar">{{ user.username|slice:":2"|upper }}</span>
+                {{ user.username }} ({{ user.get_role_display }})
+                <a href="{% url 'comptes:deconnexion' %}"><i class="fa-solid fa-right-from-bracket"></i></a>
+            </span>
+        </div>
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% block contenu %}{% endblock %}
+    </div>
+</div>
+{% else %}
+<main style="max-width:1000px; margin:0 auto; padding:0 1.5rem;">
+    {% block contenu_visiteur %}{% endblock %}
+</main>
+{% endif %}
+</body>
+</html>

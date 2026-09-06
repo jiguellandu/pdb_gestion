@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block titre %}{{ departement.nom|capfirst }}{% endblock %}
+{% block titre_page %}{{ departement.nom|capfirst }}{% endblock %}
+{% block contenu %}
+<section class="cartes" style="margin-bottom:1.5rem;">
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-users"></i></div>
+        <div><p class="carte-label">Membres</p><p class="carte-valeur">{{ nb_membres }}</p></div>
+    </div>
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-list-check"></i></div>
+        <div><p class="carte-label">Activites ce mois</p><p class="carte-valeur">{{ activites_mois.count }}</p></div>
+    </div>
+    {% if budget %}
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-chart-pie"></i></div>
+        <div><p class="carte-label">Budget {{ budget.annee }}</p><p class="carte-valeur">{{ budget.montant_disponible }} {{ budget.devise.code|upper }}</p></div>
+    </div>
+    {% endif %}
+    <div class="carte">
+        <div class="carte-icone"><i class="fa-solid fa-money-bill-wave"></i></div>
+        <div><p class="carte-label">Depenses totales</p><p class="carte-valeur">{{ depenses_totales }}</p></div>
+    </div>
+</section>
+
+<div class="table-responsive" style="padding:1.2rem; margin-bottom:1.5rem;">
+    <p><strong>Responsable :</strong> {{ departement.responsable|default:"—" }}</p>
+    <p><strong>Adjoint :</strong> {{ departement.adjoint|default:"—" }}</p>
+    <p><strong>Telephone :</strong> {{ departement.telephone|default:"—" }}</p>
+    <p><strong>Description :</strong> {{ departement.description|default:"—" }}</p>
+</div>
+
+<h2>Activites du mois</h2>
+<div class="table-responsive">
+<table>
+    <tr><th>Date</th><th>Statut</th><th>Description</th></tr>
+    {% for a in activites_mois %}
+    <tr>
+        <td>{{ a.date_activite }}</td>
+        <td>{{ a.statut.nom }}</td>
+        <td>{{ a.description|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">Aucune activite ce mois-ci</td></tr>
+    {% endfor %}
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titre %}Nouveau rendez-vous{% endblock %}
+{% block contenu %}
+<h1>Nouveau rendez-vous</h1>
+<form method="post" class="formulaire-connexion" style="max-width:500px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enregistrer</button>
+</form>
+{% endblock %}

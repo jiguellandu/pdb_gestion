@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block titre %}Rapports{% endblock %}
+{% block titre_page %}Rapports{% endblock %}
+
+{% block contenu %}
+
+<h2 style="margin-top:0;">Rapport membres</h2><section class="cartes" style="margin-bottom:2rem;"><div class="carte">
+    <div class="carte-icone">
+        <i class="fa-solid fa-users"></i>
+    </div>
+    <div>
+        <p class="carte-label">Total membres</p>
+        <p class="carte-valeur">{{ total_membres }}</p>
+    </div>
+</div>
+
+<div class="carte">
+    <div class="carte-icone">
+        <i class="fa-solid fa-user-plus"></i>
+    </div>
+    <div>
+        <p class="carte-label">Nouveaux ce mois</p>
+        <p class="carte-valeur">{{ nouveaux_ce_mois }}</p>
+    </div>
+</div>
+
+<div class="carte">
+    <div class="carte-icone">
+        <i class="fa-solid fa-venus-mars"></i>
+    </div>
+    <div>
+        <p class="carte-label">Hommes / Femmes</p>
+        <p class="carte-valeur">{{ hommes }} / {{ femmes }}</p>
+    </div>
+</div>
+
+</section><h2>Rapport financier</h2>{% for rapport in rapports_financiers %}
+
+<p style="font-weight:600; color:var(--slate); margin-bottom:0.6rem;">
+    {{ rapport.code|upper }}
+</p><section class="cartes" style="margin-bottom:2rem;"><div class="carte">
+    <div class="carte-icone">
+        <i class="fa-solid fa-hand-holding-dollar"></i>
+    </div>
+    <div>
+        <p class="carte-label">Recettes</p>
+        <p class="carte-valeur">
+            {{ rapport.recettes|floatformat:2 }}
+        </p>
+    </div>
+</div>
+
+
+<div class="carte">
+    <div class="carte-icone">
+        <i class="fa-solid fa-money-bill-wave"></i>
+    </div>
+    <div>
+        <p class="carte-label">Dépenses</p>
+        <p class="carte-valeur">
+            {{ rapport.depenses|floatformat:2 }}
+        </p>
+    </div>
+</div>
+
+
+<div class="carte">
+    <div class="carte-icone">
+        <i class="fa-solid fa-hand"></i>
+    </div>
+    <div>
+        <p class="carte-label">Dîmes</p>
+        <p class="carte-valeur">
+            {{ rapport.dimes|floatformat:2 }}
+        </p>
+    </div>
+</div>
+
+
+<div class="carte">
+    <div class="carte-icone">
+        <i class="fa-solid fa-gift"></i>
+    </div>
+    <div>
+        <p class="carte-label">Offrandes</p>
+        <p class="carte-valeur">
+            {{ rapport.offrandes|floatformat:2 }}
+        </p>
+    </div>
+</div>
+
+</section>{% empty %}
+
+<p>Aucune donnée financière enregistrée.</p>{% endfor %}
+
+<h2>Rapport activités</h2><section class="cartes"><div class="carte">
+    <div class="carte-icone">
+        <i class="fa-solid fa-list-check"></i>
+    </div>
+    <div>
+        <p class="carte-label">Total activités</p>
+        <p class="carte-valeur">{{ total_activites }}</p>
+    </div>
+</div>
+
+
+<div class="carte">
+    <div class="carte-icone">
+        <i class="fa-solid fa-check"></i>
+    </div>
+    <div>
+        <p class="carte-label">Réalisées</p>
+        <p class="carte-valeur">{{ activites_realisees }}</p>
+    </div>
+</div>
+
+
+<div class="carte">
+    <div class="carte-icone">
+        <i class="fa-solid fa-xmark"></i>
+    </div>
+    <div>
+        <p class="carte-label">Annulées</p>
+        <p class="carte-valeur">{{ activites_annulees }}</p>
+    </div>
+</div>
+
+
+<div class="carte">
+    <div class="carte-icone">
+        <i class="fa-solid fa-book-bible"></i>
+    </div>
+    <div>
+        <p class="carte-label">Prédications</p>
+        <p class="carte-valeur">{{ total_predications }}</p>
+    </div>
+</div>
+
+</section>{% endblock %}

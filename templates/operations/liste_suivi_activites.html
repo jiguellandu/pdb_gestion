@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block titre %}Suivi des activites{% endblock %}
+{% block titre_page %}Suivi des activites{% endblock %}
+{% block contenu %}
+<table>
+    <tr><th>Date</th><th>Departement</th><th>Statut</th><th>Description</th></tr>
+    {% for a in activites %}
+    <tr>
+        <td>{{ a.date_activite|default:"—" }}</td>
+        <td>{{ a.departement.nom }}</td>
+        <td>{{ a.statut.nom }}</td>
+        <td>{{ a.description|default:"—" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">Aucune activite enregistree</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

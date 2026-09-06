@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titre %}Budget{% endblock %}
+{% block titre_page %}Budget{% endblock %}
+{% block contenu %}
+<div class="table-responsive">
+<table>
+    <tr><th>Departement</th><th>Annee</th><th>Prevu</th><th>Depense</th><th>Disponible</th><th>% utilise</th></tr>
+    {% for b in budgets %}
+    <tr>
+        <td>{{ b.departement.nom }}</td>
+        <td>{{ b.annee }}</td>
+        <td>{{ b.montant_prevu }} {{ b.devise.code|upper }}</td>
+        <td>{{ b.montant_depense }} {{ b.devise.code|upper }}</td>
+        <td>{{ b.montant_disponible }} {{ b.devise.code|upper }}</td>
+        <td>{{ b.pourcentage_utilise }}%</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">Aucun budget defini</td></tr>
+    {% endfor %}
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titre %}Nouvelle predication{% endblock %}
+{% block titre_page %}Nouvelle predication{% endblock %}
+{% block contenu %}
+<form method="post" class="formulaire-connexion" style="max-width:520px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enregistrer</button>
+</form>
+{% endblock %}
