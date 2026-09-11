@@ -1,5 +1,5 @@
 from django.db import models
-from core.models import Departement, Statut
+from core.models import Departement, Statut, Eglise
 
 
 class Inventaire(models.Model):
@@ -12,6 +12,7 @@ class Inventaire(models.Model):
         ("reserve", "Reserve"), ("exterieur", "Exterieur"),
     ]
 
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     nom_article = models.CharField(max_length=150, blank=True)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     localisation = models.CharField(max_length=20, choices=LOCALISATION_CHOICES)
@@ -23,6 +24,7 @@ class Inventaire(models.Model):
 
 
 class SuiviActivite(models.Model):
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     departement = models.ForeignKey(Departement, on_delete=models.PROTECT)
     statut = models.ForeignKey(Statut, on_delete=models.PROTECT)
     description = models.TextField(blank=True)
@@ -39,6 +41,7 @@ class EvaluationSuivi(models.Model):
         ("faible", "Faible"), ("moyenne", "Moyenne"), ("elevee", "Elevee"),
     ]
 
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     departement = models.ForeignKey(Departement, on_delete=models.PROTECT)
     statut = models.ForeignKey(Statut, on_delete=models.PROTECT)
     satisfaction = models.CharField(max_length=10, choices=SATISFACTION_CHOICES)
@@ -60,6 +63,7 @@ class RenseignementCulte(models.Model):
         ("special", "Special"), ("veille", "Veille"),
     ]
 
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     statut_predicateur = models.CharField(max_length=10, choices=STATUT_PREDICATEUR_CHOICES)
     type_culte = models.CharField(max_length=10, choices=TYPE_CULTE_CHOICES)
     nom_predicateur = models.CharField(max_length=100, blank=True)
@@ -79,6 +83,7 @@ class Presence(models.Model):
         ("activite", "Autre activite"),
     ]
 
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     date_culte = models.DateField()
     type_culte = models.CharField(max_length=15, choices=TYPE_CHOICES, default="dimanche")
     nom_activite = models.CharField(max_length=150, blank=True)
@@ -106,6 +111,7 @@ class Predication(models.Model):
         ("conference", "Conference"),
     ]
 
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     date_predication = models.DateField()
     predicateur = models.CharField(max_length=150)
     theme = models.CharField(max_length=200)

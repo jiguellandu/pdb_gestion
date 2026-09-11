@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block titre %}Configuration Kobo{% endblock %}
+
+{% block titre_page %}Configuration Kobo{% endblock %}
+
+{% block contenu %}
+
+<div style="max-width:1200px; margin:0 auto;">
+
+    <!-- EN-TÊTE -->
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:1rem;
+        margin-bottom:2rem;
+        flex-wrap:wrap;
+    ">
+
+        <div>
+            <h1 style="margin-bottom:0.5rem;">
+                <i class="fa-solid fa-cloud"></i>
+                Configuration Kobo
+            </h1>
+
+            <p style="color:var(--slate); margin:0;">
+                Gestion des connexions KoboToolbox et des formulaires
+                par église.
+            </p>
+        </div>
+
+        <div style="
+            display:flex;
+            gap:0.7rem;
+            flex-wrap:wrap;
+        ">
+
+            <a
+                href="{% url 'dashboard:nouvelle_configuration_kobo' %}"
+                style="
+                    display:inline-flex;
+                    align-items:center;
+                    gap:0.5rem;
+                    padding:0.8rem 1.2rem;
+                    border-radius:8px;
+                    text-decoration:none;
+                    font-weight:600;
+                    background:#4A7856;
+                    color:white;
+                "
+            >
+                <i class="fa-solid fa-plus"></i>
+                Nouvelle configuration Kobo
+            </a>
+
+            <a
+                href="{% url 'dashboard:accueil' %}"
+                style="
+                    display:inline-flex;
+                    align-items:center;
+                    gap:0.5rem;
+                    padding:0.8rem 1.2rem;
+                    border-radius:8px;
+                    text-decoration:none;
+                    font-weight:600;
+                    background:#1B2340;
+                    color:white;
+                "
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                Retour
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- BLOC INFORMATION -->
+    <div class="table-responsive" style="
+        padding:1.5rem;
+        margin-bottom:2rem;
+        border-left:5px solid #4A7856;
+    ">
+
+        <div style="
+            display:flex;
+            align-items:center;
+            gap:1rem;
+        ">
+
+            <div style="
+                font-size:2.5rem;
+                width:65px;
+                height:65px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                border-radius:50%;
+                background:#eef5ef;
+            ">
+                <i class="fa-solid fa-cloud"></i>
+            </div>
+
+            <div>
+                <h2 style="margin:0 0 0.4rem 0;">
+                    Connexion KoboToolbox
+                </h2>
+
+                <p style="
+                    margin:0;
+                    color:var(--slate);
+                ">
+                    Chaque église dispose de sa propre configuration Kobo.
+                    Le token API est une information confidentielle.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONFIGURATIONS -->
+    <div class="table-responsive" style="
+        padding:1.5rem;
+        margin-bottom:2rem;
+    ">
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:1.2rem;
+        ">
+
+            <h2 style="margin:0;">
+                <i class="fa-solid fa-plug"></i>
+                Configurations Kobo
+            </h2>
+
+            <span style="
+                padding:0.4rem 0.7rem;
+                border-radius:20px;
+                background:#eef5ef;
+                color:#4A7856;
+                font-weight:600;
+            ">
+                {{ configurations|length }} configuration(s)
+            </span>
+
+        </div>
+
+
+        {% if configurations %}
+
+        <div style="overflow-x:auto;">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Église</th>
+                        <th>URL Kobo</th>
+                        <th>Statut</th>
+                        <th>Dernière modification</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for configuration in configurations %}
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                {{ configuration.eglise.nom }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ configuration.base_url }}
+                        </td>
+
+                        <td>
+
+                            {% if configuration.actif %}
+
+                            <span style="
+                                display:inline-block;
+                                padding:0.35rem 0.7rem;
+                                border-radius:20px;
+                                background:#e8f5e9;
+                                color:#2e7d32;
+                                font-weight:600;
+                            ">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Active
+                            </span>
+
+                            {% else %}
+
+                            <span style="
+                                display:inline-block;
+                                padding:0.35rem 0.7rem;
+                                border-radius:20px;
+                                background:#eeeeee;
+                                color:#666;
+                                font-weight:600;
+                            ">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                                Inactive
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ configuration.date_modification|date:"d/m/Y H:i" }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div style="
+            text-align:center;
+            padding:3rem 1rem;
+        ">
+
+            <div style="
+                font-size:3rem;
+                margin-bottom:1rem;
+            ">
+                <i class="fa-solid fa-cloud"></i>
+            </div>
+
+            <h3>Aucune configuration Kobo</h3>
+
+            <p style="
+                color:var(--slate);
+                max-width:600px;
+                margin:0 auto 1.5rem;
+            ">
+                Aucune église ne possède encore de configuration Kobo.
+                Commencez par créer une configuration.
+            </p>
+
+            <a
+                href="{% url 'dashboard:nouvelle_configuration_kobo' %}"
+                style="
+                    display:inline-flex;
+                    align-items:center;
+                    gap:0.5rem;
+                    padding:0.8rem 1.2rem;
+                    border-radius:8px;
+                    text-decoration:none;
+                    font-weight:600;
+                    background:#4A7856;
+                    color:white;
+                "
+            >
+                <i class="fa-solid fa-plus"></i>
+                Ajouter une configuration
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- FORMULAIRES -->
+    <div class="table-responsive" style="
+        padding:1.5rem;
+    ">
+
+        <div style="margin-bottom:1.2rem;">
+
+            <h2 style="margin:0 0 0.4rem 0;">
+                <i class="fa-solid fa-file-lines"></i>
+                Formulaires Kobo
+            </h2>
+
+            <p style="
+                margin:0;
+                color:var(--slate);
+            ">
+                Association des formulaires Kobo aux différentes églises.
+            </p>
+
+        </div>
+
+
+        {% if formulaires %}
+
+        <div style="overflow-x:auto;">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Église</th>
+                        <th>Formulaire</th>
+                        <th>UID Kobo</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for formulaire in formulaires %}
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                {{ formulaire.eglise.nom }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ formulaire.get_nom_display }}
+                        </td>
+
+                        <td>
+                            <code>{{ formulaire.uid }}</code>
+                        </td>
+
+                        <td>
+
+                            {% if formulaire.actif %}
+
+                            <span style="
+                                display:inline-block;
+                                padding:0.35rem 0.7rem;
+                                border-radius:20px;
+                                background:#e8f5e9;
+                                color:#2e7d32;
+                                font-weight:600;
+                            ">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Actif
+                            </span>
+
+                            {% else %}
+
+                            <span style="
+                                display:inline-block;
+                                padding:0.35rem 0.7rem;
+                                border-radius:20px;
+                                background:#eeeeee;
+                                color:#666;
+                                font-weight:600;
+                            ">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                                Inactif
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div style="
+            text-align:center;
+            padding:2.5rem 1rem;
+        ">
+
+            <i
+                class="fa-solid fa-file-circle-question"
+                style="font-size:3rem;"
+            ></i>
+
+            <h3>Aucun formulaire Kobo</h3>
+
+            <p style="color:var(--slate);">
+                Aucun formulaire Kobo n'est encore configuré.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

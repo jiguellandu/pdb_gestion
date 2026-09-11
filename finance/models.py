@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Sum
-from core.models import Departement, Devise, Statut
+from core.models import Departement, Devise, Statut, Eglise
 from membres.models import Membre
 
 
@@ -14,6 +14,7 @@ class Finance(models.Model):
         ("inconnu", "Inconnu"), ("eglise", "Eglise"),
     ]
 
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     devise = models.ForeignKey(Devise, on_delete=models.PROTECT)
     montant = models.DecimalField(max_digits=14, decimal_places=2)
@@ -33,6 +34,7 @@ class Depense(models.Model):
         ("especes", "Especes"), ("mobile money", "Mobile money"), ("banque", "Banque"),
     ]
 
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     type_depense = models.CharField(max_length=100)
     devise = models.ForeignKey(Devise, on_delete=models.PROTECT)
     montant = models.DecimalField(max_digits=14, decimal_places=2)
@@ -53,6 +55,7 @@ class PreuvePaiement(models.Model):
         ("especes", "Especes"), ("mobile money", "Mobile money"), ("banque", "Banque"),
     ]
 
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     depense = models.ForeignKey(Depense, on_delete=models.SET_NULL, null=True, blank=True)
     departement = models.ForeignKey(Departement, on_delete=models.PROTECT)
     devise = models.ForeignKey(Devise, on_delete=models.PROTECT)
@@ -73,19 +76,20 @@ class Achat(models.Model):
         ("faible", "Faible"), ("moyenne", "Moyenne"), ("urgente", "Urgente"),
     ]
 
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     departement = models.ForeignKey(Departement, on_delete=models.PROTECT)
     statut = models.ForeignKey(Statut, on_delete=models.PROTECT)
     urgence = models.CharField(max_length=10, choices=URGENCE_CHOICES)
     description = models.TextField(blank=True)
     date_demande = models.DateField(auto_now_add=True)
     kobo_uuid = models.CharField(max_length=64, unique=True, null=True, blank=True)
-
     def __str__(self):
         dept = self.departement.nom if self.departement else ""
         return f"{self.description or 'Achat'} — {dept}"
 
 
 class Budget(models.Model):
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     departement = models.ForeignKey(Departement, on_delete=models.CASCADE)
     annee = models.PositiveIntegerField()
     montant_prevu = models.DecimalField(max_digits=14, decimal_places=2)

@@ -1,10 +1,11 @@
 from django.db import models
-from core.models import Departement
+from core.models import Departement, Eglise
 
 
 class Membre(models.Model):
     SEXE_CHOICES = [("M", "Masculin"), ("F", "Feminin")]
 
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     nom = models.CharField(max_length=100, blank=True)
     sexe = models.CharField(max_length=10, choices=SEXE_CHOICES)
     statut_matrimonial = models.CharField(max_length=20)
@@ -21,6 +22,7 @@ class Membre(models.Model):
 class NouveauMembre(models.Model):
     SEXE_CHOICES = [("M", "Masculin"), ("F", "Feminin")]
 
+    eglise = models.ForeignKey(Eglise, on_delete=models.CASCADE, null=True, blank=True)
     nom = models.CharField(max_length=100, blank=True)
     sexe = models.CharField(max_length=10, choices=SEXE_CHOICES)
     statut_matrimonial = models.CharField(max_length=20)

@@ -2,6 +2,38 @@
 {% block titre %}Tableau de bord — Administrateur{% endblock %}
 {% block titre_page %}Tableau de bord administrateur{% endblock %}
 {% block contenu %}
+<div style="
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:1.5rem;
+">
+
+    <a
+        href="{% url 'dashboard:nouvelle_eglise' %}"
+        style="
+            display:inline-flex;
+            align-items:center;
+            gap:0.5rem;
+            padding:0.8rem 1.2rem;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:600;
+            background:#1B2340;
+            color:white;
+        "
+    >
+        <i class="fa-solid fa-church"></i>
+        Nouvelle église
+<a href="{% url 'dashboard:configuration_kobo' %}"
+   class="btn btn-primary">
+
+    <i class="fas fa-cloud"></i>
+    Configuration Kobo
+
+</a>
+    </a>
+
+</div>
 <form method="post" action="{% url 'dashboard:synchroniser' %}" class="bouton-sync">
     {% csrf_token %}
     <button type="submit"><i class="fa-solid fa-rotate"></i> Synchroniser Kobo maintenant</button>

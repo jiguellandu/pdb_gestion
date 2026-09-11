@@ -3,7 +3,7 @@ from datetime import date
 from io import StringIO
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.management import call_command
 from django.db.models import Sum, Count
 from django.db.models.functions import TruncMonth
@@ -19,7 +19,19 @@ from operations.models import (
     Predication,
 )
 from agenda.models import RendezVousPasteur, EvenementCalendrier
-from core.models import JournalActivite, Devise
+from core.models import (
+    JournalActivite,
+    Devise,
+    Eglise,
+    KoboConfiguration,
+    KoboFormulaire,
+)
+
+from .forms import (
+    EgliseForm,
+    AdministrateurEgliseForm,
+    KoboConfigurationForm,
+)
 
 
 @login_required
@@ -44,14 +56,20 @@ def accueil(request):
     return render(request, "dashboard/acces_refuse.html")
 
 
+# =============================================================
+# ADMINISTRATEUR
+# =============================================================
+
+@login_required
 def vue_admin(request):
 
-    # =========================================================
+    eglise = request.user.eglise
+
     # REPARTITION HOMMES / FEMMES
-    # =========================================================
 
     repartition_sexe = (
         Membre.objects
+        .filter(eglise=eglise)
         .values("sexe")
         .annotate(total=Count("id"))
     )
@@ -69,13 +87,11 @@ def vue_admin(request):
         elif ligne["sexe"] == "F":
             donnees_sexe["Femmes"] = ligne["total"]
 
-
-    # =========================================================
     # EVOLUTION DES FINANCES
-    # =========================================================
 
     recettes_par_mois = (
         Finance.objects
+        .filter(eglise=eglise)
         .annotate(mois=TruncMonth("date_transaction"))
         .values("mois")
         .annotate(total=Sum("montant"))
@@ -84,6 +100,7 @@ def vue_admin(request):
 
     depenses_par_mois = (
         Depense.objects
+        .filter(eglise=eglise)
         .annotate(mois=TruncMonth("date_transaction"))
         .values("mois")
         .annotate(total=Sum("montant"))
@@ -113,13 +130,11 @@ def vue_admin(request):
             for m in mois_labels
             if m
         ],
-
         "recettes": [
             recettes_dict.get(m, 0)
             for m in mois_labels
             if m
         ],
-
         "depenses": [
             depenses_dict.get(m, 0)
             for m in mois_labels
@@ -127,13 +142,11 @@ def vue_admin(request):
         ],
     }
 
-
-    # =========================================================
     # DEPENSES PAR DEPARTEMENT
-    # =========================================================
 
     depenses_dept = (
         Depense.objects
+        .filter(eglise=eglise)
         .values("departement__nom")
         .annotate(total=Sum("montant"))
         .order_by("-total")
@@ -144,81 +157,121 @@ def vue_admin(request):
             d["departement__nom"]
             for d in depenses_dept
         ],
-
         "valeurs": [
             float(d["total"])
             for d in depenses_dept
         ],
     }
 
-
-    # =========================================================
     # OFFRANDES PAR DEVISE
-    # =========================================================
 
     offrandes_par_devise = (
         Finance.objects
-        .filter(type="offrande")
+        .filter(
+            eglise=eglise,
+            type="offrande"
+        )
         .values("devise__code")
         .annotate(total=Sum("montant"))
     )
 
-
-    # =========================================================
-    # FLUX D'ACTIVITE
-    # =========================================================
+   # FLUX D'ACTIVITE
 
     rendez_vous_aujourdhui = (
         RendezVousPasteur.objects
-        .filter(date=date.today())
+        .filter(
+            eglise=eglise,
+            date=date.today()
+        )
         .order_by("heure_debut")
     )
 
     evenements_a_venir = (
         EvenementCalendrier.objects
-        .filter(date_debut__gte=date.today())
+        .filter(
+            eglise=eglise,
+            date_debut__gte=date.today()
+        )
         .order_by("date_debut")[:5]
     )
 
     activites_recentes = (
         JournalActivite.objects
-        .select_related("utilisateur")[:6]
+        .filter(utilisateur__eglise=eglise)
+        .select_related("utilisateur")
+        .order_by("-id")[:6]
     )
-
-
-    # =========================================================
     # CONTEXTE ADMIN
-    # =========================================================
 
     contexte = {
-        "nb_membres": Membre.objects.count(),
+        "nb_membres": (
+            Membre.objects
+            .filter(eglise=eglise)
+            .count()
+        ),
 
-        "nb_nouveaux_membres": NouveauMembre.objects.count(),
+        "nb_nouveaux_membres": (
+            NouveauMembre.objects
+            .filter(eglise=eglise)
+            .count()
+        ),
 
         "offrandes_par_devise": offrandes_par_devise,
 
         "achats_en_attente": (
             Achat.objects
-            .filter(statut__nom="attente")
+            .filter(
+                eglise=eglise,
+                statut__nom="attente"
+            )
             .count()
         ),
 
-        "nb_inventaire": Inventaire.objects.count(),
+        "nb_inventaire": (
+            Inventaire.objects
+            .filter(eglise=eglise)
+            .count()
+        ),
 
-        "nb_suivi_activites": SuiviActivite.objects.count(),
+        "nb_suivi_activites": (
+            SuiviActivite.objects
+            .filter(eglise=eglise)
+            .count()
+        ),
 
-        "nb_evaluations": EvaluationSuivi.objects.count(),
+        "nb_evaluations": (
+            EvaluationSuivi.objects
+            .filter(eglise=eglise)
+            .count()
+        ),
 
-        "nb_renseignements_culte": RenseignementCulte.objects.count(),
+        "nb_renseignements_culte": (
+            RenseignementCulte.objects
+            .filter(eglise=eglise)
+            .count()
+        ),
 
-        "nb_preuves_paiement": PreuvePaiement.objects.count(),
+        "nb_preuves_paiement": (
+            PreuvePaiement.objects
+            .filter(eglise=eglise)
+            .count()
+        ),
 
-        "nb_evenements": EvenementCalendrier.objects.count(),
+        "nb_evenements": (
+            EvenementCalendrier.objects
+            .filter(eglise=eglise)
+            .count()
+        ),
 
-        "nb_rendez_vous": RendezVousPasteur.objects.count(),
+        "nb_rendez_vous": (
+            RendezVousPasteur.objects
+            .filter(eglise=eglise)
+            .count()
+        ),
 
         "dernieres_depenses": (
             Depense.objects
+            .filter(eglise=eglise)
             .select_related("departement", "statut")
             .order_by("-date_creation")[:5]
         ),
@@ -249,27 +302,26 @@ def vue_admin(request):
 # CHEF DE DEPARTEMENT
 # =============================================================
 
+@login_required
 def vue_chef_departement(request):
 
-    departement = request.user.departement
+    eglise = request.user.eglise
 
     contexte = {
-        "departement": departement,
+        "departement": None,
 
         "activites": (
             SuiviActivite.objects
-            .filter(departement=departement)
+            .filter(eglise=eglise)
+            .select_related("departement", "statut")
             .order_by("-date_activite")[:10]
-            if departement
-            else []
         ),
 
         "achats": (
             Achat.objects
-            .filter(departement=departement)
+            .filter(eglise=eglise)
             .exclude(statut__nom="realise")
-            if departement
-            else []
+            .select_related("departement", "statut")
         ),
     }
 
@@ -284,20 +336,28 @@ def vue_chef_departement(request):
 # PASTEUR
 # =============================================================
 
+@login_required
 def vue_pasteur(request):
 
+    eglise = request.user.eglise
+
     contexte = {
-        "nb_membres": Membre.objects.count(),
+        "nb_membres": (
+            Membre.objects
+            .filter(eglise=eglise)
+            .count()
+        ),
 
         "nb_departements_actifs": (
             SuiviActivite.objects
+            .filter(eglise=eglise)
             .values("departement")
             .distinct()
             .count()
         ),
-
-        "depenses_par_departement": (
+"depenses_par_departement": (
             Depense.objects
+            .filter(eglise=eglise)
             .values("departement__nom")
             .annotate(
                 total=Sum("montant"),
@@ -308,7 +368,10 @@ def vue_pasteur(request):
 
         "mes_rendez_vous": (
             RendezVousPasteur.objects
-            .filter(pasteur=request.user)
+            .filter(
+                eglise=eglise,
+                pasteur=request.user
+            )
             .order_by("date", "heure_debut")[:5]
         ),
     }
@@ -336,15 +399,15 @@ def synchroniser(request):
 
         return redirect("dashboard:accueil")
 
-
     if request.method == "POST":
 
         sortie = StringIO()
 
         call_command(
-            "sync_kobo",
-            stdout=sortie
-        )
+    "sync_kobo",
+    eglise=request.user.eglise.id,
+    stdout=sortie
+)
 
         for ligne in sortie.getvalue().splitlines():
 
@@ -372,19 +435,22 @@ def rapports(request):
 
         return redirect("dashboard:accueil")
 
+    eglise = request.user.eglise
 
     aujourdhui = date.today()
 
-
-    # =========================================================
     # RAPPORT MEMBRES
-    # =========================================================
 
-    total_membres = Membre.objects.count()
+    total_membres = (
+        Membre.objects
+        .filter(eglise=eglise)
+        .count()
+    )
 
     nouveaux_ce_mois = (
         NouveauMembre.objects
         .filter(
+            eglise=eglise,
             date_creation__year=aujourdhui.year,
             date_creation__month=aujourdhui.month
         )
@@ -393,21 +459,23 @@ def rapports(request):
 
     hommes = (
         Membre.objects
-        .filter(sexe="M")
+        .filter(
+            eglise=eglise,
+            sexe="M"
+        )
         .count()
     )
 
     femmes = (
         Membre.objects
-        .filter(sexe="F")
+        .filter(
+            eglise=eglise,
+            sexe="F"
+        )
         .count()
     )
 
-
-    # =========================================================
     # RAPPORT FINANCIER
-    # SEPARATION STRICTE CDF / USD
-    # =========================================================
 
     devises = Devise.objects.all()
 
@@ -417,14 +485,20 @@ def rapports(request):
 
         recettes = (
             Finance.objects
-            .filter(devise=devise)
+            .filter(
+                eglise=eglise,
+                devise=devise
+            )
             .aggregate(total=Sum("montant"))["total"]
             or 0
         )
 
         depenses = (
             Depense.objects
-            .filter(devise=devise)
+            .filter(
+                eglise=eglise,
+                devise=devise
+            )
             .aggregate(total=Sum("montant"))["total"]
             or 0
         )
@@ -432,6 +506,7 @@ def rapports(request):
         dimes = (
             Finance.objects
             .filter(
+                eglise=eglise,
                 devise=devise,
                 type="dime"
             )
@@ -442,6 +517,7 @@ def rapports(request):
         offrandes = (
             Finance.objects
             .filter(
+                eglise=eglise,
                 devise=devise,
                 type="offrande"
             )
@@ -457,35 +533,39 @@ def rapports(request):
             "offrandes": offrandes,
         })
 
-
-    # =========================================================
     # RAPPORT ACTIVITES
-    # =========================================================
 
     total_activites = (
-        SuiviActivite.objects.count()
+        SuiviActivite.objects
+        .filter(eglise=eglise)
+        .count()
     )
 
     activites_realisees = (
         SuiviActivite.objects
-        .filter(statut__nom="realise")
+        .filter(
+            eglise=eglise,
+            statut__nom="realise"
+        )
         .count()
     )
 
     activites_annulees = (
         SuiviActivite.objects
-        .filter(statut__nom="annule")
+        .filter(
+            eglise=eglise,
+            statut__nom="annule"
+        )
         .count()
     )
 
     total_predications = (
-        Predication.objects.count()
+        Predication.objects
+        .filter(eglise=eglise)
+        .count()
     )
 
-
-    # =========================================================
     # CONTEXTE FINAL
-    # =========================================================
 
     contexte = {
         "total_membres": total_membres,
@@ -507,9 +587,124 @@ def rapports(request):
         "total_predications": total_predications,
     }
 
-
     return render(
         request,
         "dashboard/rapports.html",
         contexte
+    )
+def est_super_admin(user):
+    return user.is_authenticated and user.is_superuser
+
+
+@user_passes_test(est_super_admin)
+def nouvelle_eglise(request):
+
+    if request.method == "POST":
+        form = EgliseForm(request.POST)
+
+        if form.is_valid():
+            eglise = form.save()
+
+            messages.success(
+                request,
+                f"L'église « {eglise.nom} » a été créée avec succès."
+            )
+
+            return redirect("dashboard:nouvelle_eglise")
+
+    else:
+        form = EgliseForm()
+
+    return render(
+        request,
+        "dashboard/nouvelle_eglise.html",
+        {
+            "form": form,
+        },
+    )
+@user_passes_test(est_super_admin)
+def nouvel_administrateur(request):
+
+    if request.method == "POST":
+        form = AdministrateurEgliseForm(request.POST)
+
+        if form.is_valid():
+            utilisateur = form.save(commit=False)
+
+            utilisateur.role = "administrateur"
+            utilisateur.is_staff = True
+            utilisateur.is_active = True
+
+            utilisateur.set_password(form.cleaned_data["password"])
+
+            utilisateur.save()
+
+            messages.success(
+                request,
+                f"L'administrateur « {utilisateur.username} » "
+                f"a été créé avec succès pour l'église "
+                f"« {utilisateur.eglise.nom} »."
+            )
+
+            return redirect("dashboard:nouvel_administrateur")
+
+    else:
+        form = AdministrateurEgliseForm()
+
+    return render(
+        request,
+        "dashboard/nouvel_administrateur.html",
+        {
+            "form": form,
+        },
+    )
+@login_required
+@user_passes_test(est_super_admin)
+def configuration_kobo(request):
+
+    configurations = KoboConfiguration.objects.select_related("eglise").order_by(
+        "eglise__nom"
+    )
+
+    formulaires = KoboFormulaire.objects.select_related("eglise").order_by(
+        "eglise__nom",
+        "nom",
+    )
+
+    return render(
+        request,
+        "dashboard/configuration_kobo.html",
+        {
+            "configurations": configurations,
+            "formulaires": formulaires,
+        },
+    )
+@login_required
+@user_passes_test(est_super_admin)
+def nouvelle_configuration_kobo(request):
+
+    if request.method == "POST":
+        form = KoboConfigurationForm(request.POST)
+
+        if form.is_valid():
+            configuration = form.save()
+
+            messages.success(
+                request,
+                f"La configuration Kobo de l'église "
+                f"« {configuration.eglise.nom} » "
+                f"a été enregistrée avec succès."
+            )
+
+            return redirect("dashboard:configuration_kobo")
+
+    else:
+        form = KoboConfigurationForm()
+
+    return render(
+        request,
+        "dashboard/nouvelle_configuration_kobo.html",
+        {
+            "form": form,
+        },
     )

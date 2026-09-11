@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block titre %}Nouvelle configuration Kobo{% endblock %}
+
+{% block titre_page %}Nouvelle configuration Kobo{% endblock %}
+
+{% block contenu %}
+
+<div style="max-width:1000px; margin:0 auto;">
+
+    <!-- EN-TÊTE -->
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:1rem;
+        margin-bottom:2rem;
+        flex-wrap:wrap;
+    ">
+
+        <div>
+            <h1 style="margin-bottom:0.5rem;">
+                <i class="fa-solid fa-cloud"></i>
+                Nouvelle configuration Kobo
+            </h1>
+
+            <p style="color:var(--slate); margin:0;">
+                Configurer KoboToolbox pour une église.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'dashboard:configuration_kobo' %}"
+            style="
+                display:inline-flex;
+                align-items:center;
+                gap:0.5rem;
+                padding:0.8rem 1.2rem;
+                border-radius:8px;
+                text-decoration:none;
+                font-weight:600;
+                background:#1B2340;
+                color:white;
+            "
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+            Retour
+        </a>
+
+    </div>
+
+
+    <!-- FORMULAIRE -->
+    <div class="table-responsive" style="
+        padding:1.8rem;
+    ">
+
+        <div style="
+            margin-bottom:1.5rem;
+            padding-bottom:1rem;
+            border-bottom:1px solid #e5e7eb;
+        ">
+
+            <h2 style="margin:0 0 0.4rem 0;">
+                <i class="fa-solid fa-cog"></i>
+                Paramètres Kobo
+            </h2>
+
+            <p style="
+                margin:0;
+                color:var(--slate);
+            ">
+                Renseignez les informations de connexion KoboToolbox.
+            </p>
+
+        </div>
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+
+            {% if form.non_field_errors %}
+
+                <div style="
+                    padding:1rem;
+                    margin-bottom:1.5rem;
+                    border-radius:8px;
+                    background:#fdecec;
+                    color:#b42318;
+                ">
+                    {{ form.non_field_errors }}
+                </div>
+
+            {% endif %}
+
+
+            <!-- ÉGLISE -->
+            <div style="margin-bottom:1.5rem;">
+
+                <label
+                    for="{{ form.eglise.id_for_label }}"
+                    style="
+                        display:block;
+                        margin-bottom:0.5rem;
+                        font-weight:600;
+                    "
+                >
+                    {{ form.eglise.label }}
+                </label>
+
+                {{ form.eglise }}
+
+                {% if form.eglise.errors %}
+
+                    <div style="
+                        margin-top:0.4rem;
+                        color:#b42318;
+                    ">
+                        {{ form.eglise.errors }}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- TOKEN -->
+            <div style="margin-bottom:1.5rem;">
+
+                <label
+                    for="{{ form.api_token.id_for_label }}"
+                    style="
+                        display:block;
+                        margin-bottom:0.5rem;
+                        font-weight:600;
+                    "
+                >
+                    {{ form.api_token.label }}
+                </label>
+
+                {{ form.api_token }}
+
+                <p style="
+                    margin-top:0.5rem;
+                    color:var(--slate);
+                    font-size:0.9rem;
+                ">
+                    <i class="fa-solid fa-lock"></i>
+                    Le token Kobo est une information confidentielle.
+                </p>
+
+                {% if form.api_token.errors %}
+
+                    <div style="
+                        margin-top:0.4rem;
+                        color:#b42318;
+                    ">
+                        {{ form.api_token.errors }}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- URL -->
+            <div style="margin-bottom:1.5rem;">
+
+                <label
+                    for="{{ form.base_url.id_for_label }}"
+                    style="
+                        display:block;
+                        margin-bottom:0.5rem;
+                        font-weight:600;
+                    "
+                >
+                    {{ form.base_url.label }}
+                </label>
+
+                {{ form.base_url }}
+
+                <p style="
+                    margin-top:0.5rem;
+                    color:var(--slate);
+                    font-size:0.9rem;
+                ">
+                    Exemple :
+                    https://kf.kobotoolbox.org
+                </p>
+
+                {% if form.base_url.errors %}
+
+                    <div style="
+                        margin-top:0.4rem;
+                        color:#b42318;
+                    ">
+                        {{ form.base_url.errors }}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ACTIF -->
+            <div style="
+                margin-bottom:2rem;
+                padding:1rem;
+                background:#f8fafc;
+                border-radius:8px;
+            ">
+
+                <div style="
+                    display:flex;
+                    align-items:center;
+                    gap:0.7rem;
+                ">
+
+                    {{ form.actif }}
+
+                    <label
+                        for="{{ form.actif.id_for_label }}"
+                        style="font-weight:600;"
+                    >
+                        {{ form.actif.label }}
+                    </label>
+
+                </div>
+
+                {% if form.actif.errors %}
+
+                    <div style="
+                        margin-top:0.4rem;
+                        color:#b42318;
+                    ">
+                        {{ form.actif.errors }}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- BOUTONS -->
+            <div style="
+                display:flex;
+                gap:0.8rem;
+                flex-wrap:wrap;
+            ">
+
+                <button
+                    type="submit"
+                    style="
+                        display:inline-flex;
+                        align-items:center;
+                        gap:0.5rem;
+                        padding:0.8rem 1.2rem;
+                        border:none;
+                        border-radius:8px;
+                        font-weight:600;
+                        background:#4A7856;
+                        color:white;
+                        cursor:pointer;
+                    "
+                >
+                    <i class="fa-solid fa-save"></i>
+                    Enregistrer la configuration
+                </button>
+
+
+                <a
+                    href="{% url 'dashboard:configuration_kobo' %}"
+                    style="
+                        display:inline-flex;
+                        align-items:center;
+                        gap:0.5rem;
+                        padding:0.8rem 1.2rem;
+                        border-radius:8px;
+                        text-decoration:none;
+                        font-weight:600;
+                        background:#e5e7eb;
+                        color:#1B2340;
+                    "
+                >
+                    Annuler
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block titre %}Nouvelle église{% endblock %}
+
+{% block titre_page %}Créer une nouvelle église{% endblock %}
+
+{% block contenu %}
+
+<div style="
+    max-width: 800px;
+    margin: 0 auto;
+">
+
+    <div class="table-responsive" style="
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+    ">
+
+        <div style="
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        ">
+            <div style="
+                width: 55px;
+                height: 55px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--navy, #1B2340);
+                color: white;
+                font-size: 1.4rem;
+            ">
+                <i class="fa-solid fa-church"></i>
+            </div>
+
+            <div>
+                <h2 style="margin: 0;">
+                    Nouvelle église
+                </h2>
+
+                <p style="
+                    margin: 0.3rem 0 0;
+                    color: var(--slate, #5B6478);
+                ">
+                    Créer une nouvelle église dans PDB Gestion
+                </p>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div style="
+                    padding: 1rem;
+                    margin-bottom: 1.5rem;
+                    border-radius: 8px;
+                    background: #e8f5e9;
+                    border: 1px solid #a5d6a7;
+                ">
+                    <i class="fa-solid fa-circle-check"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div style="
+                    padding: 1rem;
+                    margin-bottom: 1rem;
+                    border-radius: 8px;
+                    background: #ffebee;
+                    border: 1px solid #ef9a9a;
+                ">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div style="margin-bottom: 1.2rem;">
+                <label for="{{ form.nom.id_for_label }}">
+                    <strong>{{ form.nom.label }}</strong>
+                </label>
+
+                {{ form.nom }}
+
+                {% if form.nom.errors %}
+                    <div style="color: #b71c1c; margin-top: 0.3rem;">
+                        {{ form.nom.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="margin-bottom: 1.2rem;">
+                <label for="{{ form.adresse.id_for_label }}">
+                    <strong>{{ form.adresse.label }}</strong>
+                </label>
+
+                {{ form.adresse }}
+
+                {% if form.adresse.errors %}
+                    <div style="color: #b71c1c; margin-top: 0.3rem;">
+                        {{ form.adresse.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="margin-bottom: 1.2rem;">
+                <label for="{{ form.ville.id_for_label }}">
+                    <strong>{{ form.ville.label }}</strong>
+                </label>
+
+                {{ form.ville }}
+
+                {% if form.ville.errors %}
+                    <div style="color: #b71c1c; margin-top: 0.3rem;">
+                        {{ form.ville.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="margin-bottom: 1.2rem;">
+                <label for="{{ form.telephone.id_for_label }}">
+                    <strong>{{ form.telephone.label }}</strong>
+                </label>
+
+                {{ form.telephone }}
+
+                {% if form.telephone.errors %}
+                    <div style="color: #b71c1c; margin-top: 0.3rem;">
+                        {{ form.telephone.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="margin-bottom: 1.2rem;">
+                <label for="{{ form.email.id_for_label }}">
+                    <strong>{{ form.email.label }}</strong>
+                </label>
+
+                {{ form.email }}
+
+                {% if form.email.errors %}
+                    <div style="color: #b71c1c; margin-top: 0.3rem;">
+                        {{ form.email.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                margin: 1.5rem 0;
+            ">
+                {{ form.actif }}
+
+                <label for="{{ form.actif.id_for_label }}">
+                    <strong>{{ form.actif.label }}</strong>
+                </label>
+            </div>
+
+            <div style="
+                display: flex;
+                gap: 1rem;
+                margin-top: 2rem;
+                flex-wrap: wrap;
+            ">
+
+                <button
+                    type="submit"
+                    style="
+                        border: none;
+                        border-radius: 8px;
+                        padding: 0.8rem 1.4rem;
+                        cursor: pointer;
+                        font-weight: 600;
+                    "
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Créer l'église
+                </button>
+
+                <a
+                    href="{% url 'dashboard:accueil' %}"
+                    style="
+                        display: inline-block;
+                        padding: 0.8rem 1.4rem;
+                        border-radius: 8px;
+                        text-decoration: none;
+                    "
+                >
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Retour au tableau de bord
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
