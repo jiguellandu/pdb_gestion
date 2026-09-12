@@ -5,22 +5,28 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
-
 def connexion(request):
     if request.method == "POST":
         username = request.POST.get("username")
-password = request.POST.get("password")
+        password = request.POST.get("password")
 
-print("DIAGNOSTIC LOGIN - username :", repr(username))
-print("DIAGNOSTIC LOGIN - longueur mot de passe :", len(password) if password else 0)
+        print("DIAGNOSTIC LOGIN - username :", repr(username))
+        print("DIAGNOSTIC LOGIN - longueur mot de passe :", len(password) if password else 0)
 
-user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=username, password=password)
 
-print("DIAGNOSTIC LOGIN - utilisateur :", user)
+        print("DIAGNOSTIC LOGIN - utilisateur :", user)
+
         if user is not None:
             login(request, user)
             return redirect("dashboard:accueil")
-        return render(request, "comptes/connexion.html", {"erreur": "Identifiants incorrects"})
+
+        return render(
+            request,
+            "comptes/connexion.html",
+            {"erreur": "Identifiants incorrects"},
+        )
+
     return render(request, "comptes/connexion.html")
 
 
