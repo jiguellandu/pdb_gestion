@@ -3,6 +3,7 @@ from comptes.models import Utilisateur
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.db import connection
 
 
 def connexion(request):
@@ -20,6 +21,24 @@ def connexion(request):
             request,
             username=username,
             password=password
+        )
+
+        print("DIAGNOSTIC DB - NAME :", connection.settings_dict.get("NAME"))
+        print("DIAGNOSTIC DB - HOST :", connection.settings_dict.get("HOST"))
+        print(
+            "DIAGNOSTIC DB - nombre utilisateurs :",
+            Utilisateur.objects.count()
+        )
+        print(
+            "DIAGNOSTIC DB - recherche jiguel :",
+            list(
+                Utilisateur.objects.filter(username="jiguel").values(
+                    "username",
+                    "eglise_id",
+                    "is_superuser",
+                    "is_staff"
+                )
+            )
         )
 
         u_test = Utilisateur.objects.filter(username=username).first()
@@ -42,8 +61,6 @@ def connexion(request):
         )
 
     return render(request, "comptes/connexion.html")
-
-
 def deconnexion(request):
     logout(request)
     return redirect("comptes:connexion")
